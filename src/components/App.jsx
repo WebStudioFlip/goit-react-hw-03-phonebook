@@ -3,8 +3,7 @@ import { nanoid } from 'nanoid';
 import ContactForm from './ContactForm';
 import ContactList from './ContactList';
 import Filter from './Filter';
-import Section from '../shared/Section'
-
+import Section from '../shared/Section';
 
 class App extends Component {
   state = {
@@ -16,6 +15,22 @@ class App extends Component {
     ],
     filter: '',
   };
+
+  componentDidMount() {
+    const contacts = localStorage.getItem('contacts');
+    if (contacts && JSON.parse(contacts).length) {
+      this.setState({
+        contacts: JSON.parse(contacts),
+      });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts.length !== this.state.contacts.length) {
+      const { contacts } = this.state;
+      localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
+  }
 
   addContact = addContact => {
     const { contacts } = this.state;
@@ -78,15 +93,18 @@ class App extends Component {
           padding: '20px',
         }}
       >
-        <Section title='Phonebook'>        
-        <ContactForm addContact={this.addContact} />
+        <Section title="Phonebook">
+          <ContactForm addContact={this.addContact} />
         </Section>
-        <Section title='Contacts'>  
-        <Filter filterContacts={this.handleSearch} filter={this.state.filter} />
-        <ContactList
-          contacts={this.getFilteredContacts()}
-          removeContact={this.removeContact}
-        />
+        <Section title="Contacts">
+          <Filter
+            filterContacts={this.handleSearch}
+            filter={this.state.filter}
+          />
+          <ContactList
+            contacts={this.getFilteredContacts()}
+            removeContact={this.removeContact}
+          />
         </Section>
       </div>
     );
